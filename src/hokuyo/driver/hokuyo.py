@@ -37,17 +37,17 @@ class Hokuyo(object):
     CHARS_PER_LINE = 66.0
     CHARS_PER_BLOCK = 64.0
 
-    START_DEG = 119.885
-    STEP_DEG = 0.35208516886930985
+    START_DEG = None   #using a class variable could be problematic when running 2 different LIDARs on the same machine
+    STEP_DEG = None
 
-    START_STEP = 44
-    STOP_STEP = 725
+    START_STEP = None
+    STOP_STEP = None
 
     VERSION_INFO_LINES = 6
     SENSOR_STATE_LINES = 8
     SENSOR_SPECS_LINES = 9
 
-    def __init__(self, port):
+    def __init__(self, port, model_name = "URG-04LX"):
         self.__port = port
         self.__port_lock = threading.RLock()
 
@@ -56,6 +56,20 @@ class Hokuyo(object):
 
         self.__is_active = True
         self.__scanning_allowed = False
+
+        if model_name == "URG-04LX":
+            Hokuyo.START_DEG = 119.885
+            Hokuyo.STEP_DEG = 0.35208516886930985
+            Hokuyo.START_STEP = 44
+            Hokuyo.STOP_STEP = 725
+        elif model_name == "UTM-30LX":
+            Hokuyo.START_DEG = 270.0 / 2
+            Hokuyo.STEP_DEG = 0.25
+            Hokuyo.START_STEP = 0
+            Hokuyo.STOP_STEP = 1080
+        else:
+            raise ValueError("Unsupported Hokuyo laser model: "+str(model_name))
+
 
     def __offset(self):
         count = 2
@@ -312,3 +326,19 @@ class Hokuyo(object):
         angles = sorted(scan.keys())
         distances = list(map(scan.get, angles))
         return angles, distances
+
+
+
+
+
+
+if __name__ == '__main__':
+    port=None
+    laser = Hokuyo(port, model_name = "UTM-30LX")
+    print(laser.START_DEG,laser.STOP_STEP, laser.START_STEP, laser.STOP_STEP)
+    laser = Hokuyo(port, model_name = "URG-04LX")
+    print(laser.START_DEG,laser.STOP_STEP, laser.START_STEP, laser.STOP_STEP)
+    try:
+        laser = Hokuyo(port, model_name = "Some_Hokuyo_model")
+    except Exception as e:
+        print "Got Exception --", str(e)
