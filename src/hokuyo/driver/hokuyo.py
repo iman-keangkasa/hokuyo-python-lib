@@ -224,7 +224,7 @@ class Hokuyo(object):
 
         return distances
 
-    def get_single_scan(self, start_step=START_STEP, stop_step=STOP_STEP, cluster_count=1):
+    def get_single_scan(self, start_step=Hokuyo.START_STEP, stop_step=Hokuyo.STOP_STEP, cluster_count=1):
         self.__port_lock.acquire()
         try:
             cmd = 'GD%04d%04d%02d\n' % (start_step, stop_step, cluster_count)
@@ -250,8 +250,7 @@ class Hokuyo(object):
         finally:
             self.__port_lock.release()
 
-    def __get_multiple_scans(self, start_step=START_STEP, stop_step=STOP_STEP, cluster_count=1,
-                             scan_interval=0, number_of_scans=0):
+    def __get_multiple_scans(self, start_step=Hokuyo.START_STEP, stop_step=Hokiyo.STOP_STEP, cluster_count=1, scan_interval=0, number_of_scans=0):
         self.__port_lock.acquire()
         try:
             cmd = 'MD%04d%04d%02d%01d%02d\n' % (start_step, stop_step, cluster_count, scan_interval, number_of_scans)
